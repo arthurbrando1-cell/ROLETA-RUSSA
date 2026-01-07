@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROLETA RUSSA - Multiplayer</title>
+    <title>ROLETA RUSSA - Multiplayer Extremo</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Orbitron:wght@400;700;900&family=Russo+One&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Orbitron', sans-serif;
             background: #000;
             color: #fff;
             overflow: hidden;
@@ -21,44 +21,45 @@
         }
 
         .font-horror { font-family: 'Creepster', cursive; }
-        .font-tech { font-family: 'Orbitron', sans-serif; }
+        .font-russo { font-family: 'Russo One', sans-serif; }
 
-        /* Animated Dark Background */
-        .bg-horror {
+        /* Animated Background */
+        .bg-animated {
             position: fixed;
             inset: 0;
             background: 
-                radial-gradient(ellipse at 20% 80%, rgba(80, 0, 0, 0.3) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(60, 0, 0, 0.2) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(30, 0, 0, 0.4) 0%, transparent 80%),
+                radial-gradient(ellipse at 20% 80%, rgba(80, 0, 0, 0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(60, 0, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(20, 0, 0, 0.5) 0%, transparent 70%),
                 linear-gradient(180deg, #0a0000 0%, #000000 50%, #050000 100%);
             z-index: -2;
         }
 
-        /* Floating Blood Particles */
-        .blood-particles {
+        /* Blood Rain */
+        .blood-rain {
             position: fixed;
             inset: 0;
             z-index: -1;
             overflow: hidden;
+            pointer-events: none;
         }
-        .blood-particle {
+        .blood-drop {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle, #ff0000 0%, #660000 100%);
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, #8b0000, #ff0000);
             border-radius: 50%;
-            animation: floatParticle 15s infinite;
-            opacity: 0.3;
+            animation: bloodFall linear infinite;
+            opacity: 0.6;
         }
-        @keyframes floatParticle {
-            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        @keyframes bloodFall {
+            0% { transform: translateY(-100vh) rotate(15deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(100vh) rotate(15deg); opacity: 0; }
         }
 
-        /* Scan Lines */
+        /* Scanlines */
         .scanlines {
             position: fixed;
             inset: 0;
@@ -71,73 +72,80 @@
             );
             pointer-events: none;
             z-index: 1000;
-            opacity: 0.15;
+            opacity: 0.1;
         }
 
         /* Vignette */
         .vignette {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.9) 100%);
             pointer-events: none;
             z-index: 999;
         }
 
         /* Glass Card */
         .glass-card {
-            background: linear-gradient(135deg, rgba(15, 0, 0, 0.9) 0%, rgba(5, 0, 0, 0.95) 100%);
-            border: 1px solid rgba(255, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgba(20, 0, 0, 0.95) 0%, rgba(5, 0, 0, 0.98) 100%);
+            border: 1px solid rgba(255, 0, 0, 0.15);
             backdrop-filter: blur(20px);
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.8),
-                0 0 100px rgba(100, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+                0 25px 80px rgba(0, 0, 0, 0.9),
+                0 0 150px rgba(100, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.02),
+                inset 0 0 100px rgba(100, 0, 0, 0.05);
         }
 
-        /* Glowing Border */
-        .glow-border {
+        /* Neon Border Animation */
+        .neon-border {
             position: relative;
         }
-        .glow-border::before {
+        .neon-border::before {
             content: '';
             position: absolute;
-            inset: -2px;
-            background: linear-gradient(45deg, #ff0000, #330000, #ff0000, #330000);
+            inset: -3px;
+            background: linear-gradient(45deg, #ff0000, #330000, #ff0000, #660000, #ff0000);
             background-size: 400% 400%;
             border-radius: inherit;
             z-index: -1;
-            animation: glowMove 8s ease infinite;
-            opacity: 0.5;
+            animation: neonPulse 4s ease infinite;
+            filter: blur(8px);
+            opacity: 0.6;
         }
-        @keyframes glowMove {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        @keyframes neonPulse {
+            0%, 100% { background-position: 0% 50%; opacity: 0.6; }
+            50% { background-position: 100% 50%; opacity: 0.9; }
         }
 
-        /* Input Style */
-        .input-horror {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 0, 0, 0.2);
+        /* Input */
+        .input-dark {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(255, 0, 0, 0.2);
             color: #fff;
             transition: all 0.3s ease;
         }
-        .input-horror:focus {
+        .input-dark:focus {
             outline: none;
-            border-color: rgba(255, 0, 0, 0.6);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2), inset 0 0 20px rgba(255, 0, 0, 0.05);
-        }
-        .input-horror::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 0, 0, 0.7);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3), inset 0 0 30px rgba(255, 0, 0, 0.05);
         }
 
-        /* Button Styles */
+        /* Buttons */
         .btn-blood {
-            background: linear-gradient(135deg, #8b0000 0%, #4a0000 100%);
-            border: 1px solid rgba(255, 50, 50, 0.3);
+            background: linear-gradient(135deg, #8b0000 0%, #3d0000 50%, #8b0000 100%);
+            background-size: 200% 200%;
+            border: 2px solid rgba(255, 50, 50, 0.4);
             color: #fff;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: btnPulse 3s ease infinite;
+        }
+        @keyframes btnPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
         .btn-blood::before {
             content: '';
@@ -146,25 +154,25 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
             transition: left 0.5s;
         }
         .btn-blood:hover::before {
             left: 100%;
         }
         .btn-blood:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.2);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(139, 0, 0, 0.6), 0 0 60px rgba(255, 0, 0, 0.3);
         }
 
         .btn-ghost {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.5);
             transition: all 0.3s ease;
         }
         .btn-ghost:hover {
-            border-color: rgba(255, 0, 0, 0.5);
+            border-color: rgba(255, 0, 0, 0.6);
             color: #fff;
             background: rgba(255, 0, 0, 0.1);
         }
@@ -173,170 +181,190 @@
         .room-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            cursor: pointer;
         }
         .room-card:hover {
-            background: rgba(139, 0, 0, 0.2);
-            border-color: rgba(139, 0, 0, 0.5);
-            transform: translateX(5px);
+            background: rgba(139, 0, 0, 0.3);
+            border-color: rgba(139, 0, 0, 0.6);
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(139, 0, 0, 0.3);
+        }
+
+        /* Avatar Selection */
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid transparent;
             cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: rgba(0,0,0,0.5);
+        }
+        .avatar-option:hover {
+            transform: scale(1.15);
+            border-color: rgba(255,0,0,0.5);
+        }
+        .avatar-option.selected {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255,0,0,0.6);
         }
 
         /* Player Slot */
         .player-slot {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             border: 2px dashed rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
         .player-slot.occupied {
-            background: rgba(139, 0, 0, 0.3);
-            border: 2px solid rgba(139, 0, 0, 0.6);
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.4) 0%, rgba(60, 0, 0, 0.6) 100%);
+            border: 2px solid rgba(139, 0, 0, 0.7);
         }
         .player-slot.is-me {
             border-color: #ff0000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
         }
 
         /* 3D Labels */
         .label-3d {
             position: absolute;
-            padding: 6px 12px;
-            background: rgba(0, 0, 0, 0.9);
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             transform: translate(-50%, -50%);
             pointer-events: none;
             transition: all 0.3s;
             white-space: nowrap;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+        }
+        .label-3d .avatar-emoji {
+            font-size: 20px;
         }
         .label-3d.current-turn {
             border-color: #ff0000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
-            animation: pulseTurn 1s infinite;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            animation: turnPulse 0.8s infinite;
         }
         .label-3d.dead {
-            opacity: 0.4;
+            opacity: 0.3;
             text-decoration: line-through;
             color: #666;
         }
-        @keyframes pulseTurn {
+        @keyframes turnPulse {
             0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.05); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
         }
 
-        /* Mic Icons */
-        .mic-icon {
+        /* Mic Status */
+        .mic-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
         }
-        .mic-icon.active {
+        .mic-status.on {
+            background: rgba(0, 255, 0, 0.2);
             color: #00ff00;
             animation: micPulse 0.5s infinite;
         }
-        .mic-icon.muted {
+        .mic-status.off {
+            background: rgba(255, 0, 0, 0.2);
             color: #ff0000;
         }
         @keyframes micPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(0,255,0,0.5); }
+            50% { opacity: 0.7; box-shadow: 0 0 5px rgba(0,255,0,0.3); }
         }
 
         /* Chat */
         .chat-container {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 10px;
         }
-        .chat-message {
-            animation: slideInMsg 0.3s ease;
+        .chat-msg {
+            animation: msgSlide 0.3s ease;
         }
-        @keyframes slideInMsg {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes msgSlide {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         /* Blood Overlay */
         .blood-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle, transparent 30%, rgba(150, 0, 0, 0.8) 100%);
+            background: radial-gradient(circle, transparent 20%, rgba(150, 0, 0, 0.9) 100%);
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s;
             pointer-events: none;
             z-index: 500;
         }
 
-        /* Title Glow */
-        .title-glow {
+        /* Game Message */
+        .game-msg {
             text-shadow: 
-                0 0 10px rgba(255, 0, 0, 0.8),
-                0 0 20px rgba(255, 0, 0, 0.6),
-                0 0 40px rgba(255, 0, 0, 0.4),
-                0 0 80px rgba(255, 0, 0, 0.2);
+                0 0 20px currentColor,
+                0 0 40px currentColor,
+                0 0 80px currentColor;
+        }
+
+        /* Skull Animation */
+        @keyframes skullFloat {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(139, 0, 0, 0.5); border-radius: 3px; }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeInUp { animation: fadeInUp 0.6s ease forwards; }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Spinner */
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(139, 0, 0, 0.3);
-            border-top-color: #8b0000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Game Message */
-        .game-msg {
-            text-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
-        }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 0, 0, 0.6); border-radius: 4px; }
     </style>
 </head>
 <body>
     <!-- Background Effects -->
-    <div class="bg-horror"></div>
-    <div class="blood-particles" id="particles-container"></div>
+    <div class="bg-animated"></div>
+    <div class="blood-rain" id="blood-rain"></div>
     <div class="scanlines"></div>
     <div class="vignette"></div>
     <div id="blood-overlay" class="blood-overlay"></div>
 
     <!-- ========== LOBBY SCREEN ========== -->
     <div id="lobby-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="glass-card glow-border rounded-2xl w-full max-w-5xl overflow-hidden animate-fadeInUp">
+        <div class="glass-card neon-border rounded-3xl w-full max-w-5xl overflow-hidden">
             
             <!-- Header -->
             <div class="p-8 border-b border-red-900/30 relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-red-900/20 via-transparent to-red-900/20"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-red-900/10 via-transparent to-red-900/10"></div>
                 <div class="relative flex items-center justify-between">
-                    <div>
-                        <h1 class="font-horror text-6xl text-red-600 title-glow tracking-wider">ROLETA RUSSA</h1>
-                        <p class="text-red-400/60 mt-2 text-sm font-tech tracking-[0.3em]">MULTIPLAYER ONLINE • EXTREME</p>
+                    <div class="flex items-center gap-6">
+                        <div class="text-6xl" style="animation: skullFloat 3s ease infinite;">💀</div>
+                        <div>
+                            <h1 class="font-horror text-5xl md:text-6xl text-red-600 tracking-wider" style="text-shadow: 0 0 30px rgba(255,0,0,0.8);">ROLETA RUSSA</h1>
+                            <p class="text-red-500/60 mt-2 text-sm tracking-[0.5em] font-russo">MULTIPLAYER EXTREMO</p>
+                        </div>
                     </div>
                     <div id="user-display" class="hidden text-right">
-                        <p class="text-xs text-red-400/60 uppercase tracking-wider">Jogando como</p>
-                        <p id="my-name-display" class="text-2xl font-bold text-white font-tech"></p>
+                        <p class="text-xs text-red-400/60 uppercase tracking-wider mb-1">Jogando como</p>
+                        <div class="flex items-center gap-3 justify-end">
+                            <span id="my-avatar-display" class="text-3xl"></span>
+                            <span id="my-name-display" class="text-2xl font-bold text-white"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -345,61 +373,79 @@
             <div class="p-8">
                 
                 <!-- LOGIN VIEW -->
-                <div id="login-view" class="flex flex-col items-center justify-center py-12">
-                    <div class="w-32 h-32 mb-8 rounded-full bg-gradient-to-br from-red-900 to-red-950 flex items-center justify-center relative">
+                <div id="login-view" class="flex flex-col items-center justify-center py-8">
+                    <div class="w-40 h-40 mb-8 rounded-full bg-gradient-to-br from-red-900 to-black flex items-center justify-center relative">
                         <div class="absolute inset-0 rounded-full border-2 border-red-600/30 animate-ping"></div>
-                        <i class="fas fa-skull text-5xl text-red-500"></i>
+                        <div class="absolute inset-2 rounded-full border border-red-800/50"></div>
+                        <i class="fas fa-skull text-6xl text-red-500"></i>
                     </div>
-                    <h2 class="text-3xl font-tech text-gray-300 mb-2 tracking-wider">IDENTIFIQUE-SE</h2>
-                    <p class="text-gray-600 text-sm mb-8">Entre com seu nome para jogar</p>
+                    
+                    <h2 class="text-2xl font-russo text-gray-300 mb-6 tracking-wider">ESCOLHA SEU AVATAR</h2>
+                    
+                    <!-- Avatar Selection -->
+                    <div id="avatar-grid" class="flex gap-3 mb-8 flex-wrap justify-center max-w-md">
+                        <div class="avatar-option selected" data-avatar="💀">💀</div>
+                        <div class="avatar-option" data-avatar="👹">👹</div>
+                        <div class="avatar-option" data-avatar="🎃">🎃</div>
+                        <div class="avatar-option" data-avatar="👻">👻</div>
+                        <div class="avatar-option" data-avatar="🤡">🤡</div>
+                        <div class="avatar-option" data-avatar="😈">😈</div>
+                        <div class="avatar-option" data-avatar="🧛">🧛</div>
+                        <div class="avatar-option" data-avatar="🧟">🧟</div>
+                        <div class="avatar-option" data-avatar="☠️">☠️</div>
+                        <div class="avatar-option" data-avatar="🔪">🔪</div>
+                    </div>
+                    
                     <input type="text" id="nickname-input" 
-                        class="input-horror w-80 px-6 py-4 rounded-lg text-center text-xl font-bold uppercase tracking-wider mb-6"
+                        class="input-dark w-80 px-6 py-4 rounded-xl text-center text-xl font-bold uppercase tracking-wider mb-6"
                         placeholder="SEU NOME" maxlength="12">
-                    <button id="btn-enter" class="btn-blood px-12 py-4 rounded-lg font-tech text-lg tracking-widest">
-                        <i class="fas fa-door-open mr-3"></i> ENTRAR
+                    
+                    <button id="btn-enter" class="btn-blood px-12 py-4 rounded-xl font-russo text-lg tracking-widest">
+                        <i class="fas fa-door-open mr-3"></i> ENTRAR NO INFERNO
                     </button>
+                    
                     <p class="text-xs text-red-900 mt-10 max-w-md text-center">
                         <i class="fas fa-exclamation-triangle mr-1"></i>
-                        Conteúdo simulado +18. Apenas entretenimento.
+                        Conteúdo +18. Simulação apenas. Entretenimento.
                     </p>
                 </div>
 
                 <!-- ROOMS VIEW -->
                 <div id="rooms-view" class="hidden">
-                    <div class="grid grid-cols-3 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         
                         <!-- Rooms List -->
-                        <div class="col-span-2">
+                        <div class="md:col-span-2">
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-tech text-lg text-gray-400 tracking-wider flex items-center gap-3">
-                                    <i class="fas fa-door-closed text-red-700"></i> SALAS DISPONÍVEIS
+                                <h3 class="font-russo text-lg text-gray-400 tracking-wider flex items-center gap-3">
+                                    <i class="fas fa-door-closed text-red-700"></i> SALAS ABERTAS
                                 </h3>
                                 <button id="btn-refresh" class="text-gray-600 hover:text-red-500 transition-colors text-sm">
                                     <i class="fas fa-sync-alt mr-1"></i> Atualizar
                                 </button>
                             </div>
-                            <div id="rooms-list" class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                            <div id="rooms-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
                                 <div class="flex items-center justify-center py-16 text-gray-600">
-                                    <div class="spinner mr-4"></div>
-                                    Buscando salas...
+                                    <div class="w-8 h-8 border-2 border-red-900 border-t-red-500 rounded-full animate-spin mr-4"></div>
+                                    Procurando salas...
                                 </div>
                             </div>
                         </div>
 
                         <!-- Create Room -->
-                        <div class="glass-card rounded-xl p-6">
-                            <h3 class="font-tech text-lg text-gray-400 tracking-wider mb-6 flex items-center gap-3">
+                        <div class="glass-card rounded-xl p-6 border border-red-900/30">
+                            <h3 class="font-russo text-lg text-gray-400 tracking-wider mb-6 flex items-center gap-3">
                                 <i class="fas fa-plus-circle text-red-700"></i> CRIAR SALA
                             </h3>
                             <input type="text" id="room-name-input" 
-                                class="input-horror w-full px-4 py-3 rounded-lg text-sm mb-4"
+                                class="input-dark w-full px-4 py-3 rounded-lg text-sm mb-4"
                                 placeholder="Nome da sala..." maxlength="20">
-                            <button id="btn-create" class="btn-blood w-full py-3 rounded-lg font-tech tracking-wider">
+                            <button id="btn-create" class="btn-blood w-full py-3 rounded-lg font-russo tracking-wider">
                                 CRIAR SALA
                             </button>
                             <div class="mt-6 pt-6 border-t border-white/5 space-y-3">
                                 <div class="flex items-center text-xs text-gray-500">
-                                    <i class="fas fa-users w-6 text-red-900"></i> Máx. 6 jogadores
+                                    <i class="fas fa-users w-6 text-red-900"></i> Máximo 6 jogadores
                                 </div>
                                 <div class="flex items-center text-xs text-gray-500">
                                     <i class="fas fa-microphone w-6 text-red-900"></i> Chat de voz
@@ -408,7 +454,7 @@
                                     <i class="fas fa-comment w-6 text-red-900"></i> Chat de texto
                                 </div>
                                 <div class="flex items-center text-xs text-gray-500">
-                                    <i class="fas fa-skull-crossbones w-6 text-red-900"></i> Eliminação
+                                    <i class="fas fa-skull-crossbones w-6 text-red-900"></i> Gore extremo
                                 </div>
                             </div>
                         </div>
@@ -420,8 +466,8 @@
     </div>
 
     <!-- ========== WAITING ROOM ========== -->
-    <div id="waiting-room" class="fixed inset-0 z-40 hidden items-center justify-center p-4" style="display: none;">
-        <div class="glass-card glow-border rounded-2xl w-full max-w-4xl overflow-hidden animate-fadeInUp">
+    <div id="waiting-room" class="fixed inset-0 z-40 hidden items-center justify-center p-4">
+        <div class="glass-card neon-border rounded-3xl w-full max-w-4xl overflow-hidden">
             <div class="p-6 border-b border-red-900/30 flex items-center justify-between">
                 <div>
                     <p class="text-xs text-red-400/60 uppercase tracking-wider">Sala</p>
@@ -434,20 +480,18 @@
             
             <div class="p-6">
                 <h3 class="text-sm text-gray-500 uppercase tracking-wider mb-4">Jogadores na Mesa</h3>
-                <div id="players-grid" class="grid grid-cols-3 gap-4 mb-6">
-                    <!-- Slots gerados via JS -->
-                </div>
+                <div id="players-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6"></div>
                 
                 <div id="host-controls" class="hidden border-t border-red-900/30 pt-6">
-                    <button id="btn-start-match" class="btn-blood w-full py-4 rounded-lg font-horror text-2xl tracking-widest disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                    <button id="btn-start-match" class="btn-blood w-full py-4 rounded-xl font-horror text-2xl tracking-widest disabled:opacity-30 disabled:cursor-not-allowed" disabled>
                         <i class="fas fa-play mr-3"></i> INICIAR JOGO
                     </button>
-                    <p class="text-center text-xs text-gray-600 mt-2">Mínimo 2 jogadores para iniciar</p>
+                    <p class="text-center text-xs text-gray-600 mt-2">Mínimo 2 jogadores</p>
                 </div>
                 
                 <div id="guest-waiting" class="text-center py-6">
-                    <div class="spinner mx-auto mb-4"></div>
-                    <p class="text-gray-400">Aguardando o host iniciar a partida...</p>
+                    <div class="w-8 h-8 border-2 border-red-900 border-t-red-500 rounded-full animate-spin mx-auto mb-4"></div>
+                    <p class="text-gray-400">Aguardando o host iniciar...</p>
                 </div>
             </div>
         </div>
@@ -464,7 +508,11 @@
                 </button>
                 
                 <div class="flex items-center gap-4">
-                    <button id="btn-mic" class="w-12 h-12 rounded-full btn-ghost flex items-center justify-center text-xl">
+                    <div id="round-info" class="text-right">
+                        <p class="text-xs text-gray-500">RODADA</p>
+                        <p id="round-num" class="text-2xl font-horror text-red-500">1</p>
+                    </div>
+                    <button id="btn-mic" class="w-14 h-14 rounded-full btn-ghost flex items-center justify-center text-2xl border-2">
                         <i class="fas fa-microphone-slash"></i>
                     </button>
                 </div>
@@ -476,26 +524,27 @@
                 <p id="msg-sub" class="text-xl text-gray-400 mt-4"></p>
             </div>
 
-            <!-- Bottom: Trigger Button -->
+            <!-- Bottom -->
             <div class="flex justify-center items-end pb-10">
-                <button id="btn-trigger" class="hidden pointer-events-auto btn-blood px-16 py-6 rounded-xl font-horror text-4xl tracking-widest transform hover:scale-105 transition-transform">
+                <button id="btn-trigger" class="hidden pointer-events-auto btn-blood px-20 py-8 rounded-2xl font-horror text-5xl tracking-widest transform hover:scale-105 transition-transform">
                     <i class="fas fa-hand-pointer mr-4"></i> PUXAR GATILHO
                 </button>
                 
                 <div id="watching-msg" class="hidden text-center">
-                    <p class="text-gray-500 text-lg"><i class="fas fa-eye mr-2"></i> Observando...</p>
+                    <p class="text-gray-500 text-lg"><i class="fas fa-eye mr-2"></i> Aguardando...</p>
                 </div>
             </div>
         </div>
 
         <!-- Chat Box -->
         <div id="chat-box" class="absolute bottom-6 left-6 w-80 pointer-events-auto">
-            <div class="chat-container rounded-lg overflow-hidden">
-                <div id="chat-messages" class="h-40 overflow-y-auto p-3 space-y-2 text-sm">
-                    <!-- Messages here -->
+            <div class="chat-container overflow-hidden">
+                <div class="bg-black/50 px-3 py-2 border-b border-red-900/30">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider"><i class="fas fa-comment mr-2"></i>Chat</span>
                 </div>
-                <div class="border-t border-white/10 p-2 flex gap-2">
-                    <input type="text" id="chat-input" class="input-horror flex-1 px-3 py-2 rounded text-sm" placeholder="Digite uma mensagem..." maxlength="100">
+                <div id="chat-messages" class="h-32 overflow-y-auto p-3 space-y-2 text-sm"></div>
+                <div class="border-t border-red-900/30 p-2 flex gap-2">
+                    <input type="text" id="chat-input" class="input-dark flex-1 px-3 py-2 rounded text-sm" placeholder="Digite..." maxlength="100">
                     <button id="btn-send-chat" class="btn-blood px-4 py-2 rounded text-sm">
                         <i class="fas fa-paper-plane"></i>
                     </button>
@@ -534,15 +583,17 @@
         let myId = localStorage.getItem('rr_id') || 'u_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('rr_id', myId);
         let myName = "";
+        let myAvatar = "💀";
         let currentRoom = null;
         let isHost = false;
         let mySlot = -1;
         let gameData = null;
+        let roundNum = 1;
 
         // 3D
         let scene, camera, renderer, clock;
         let playerMeshes = {};
-        let gunGroup, cylinderMesh;
+        let magnumGun, cylinderMesh;
         let particles = [];
         let audioCtx;
 
@@ -566,24 +617,34 @@
         const $chatMessages = document.getElementById('chat-messages');
         const $chatInput = document.getElementById('chat-input');
 
-        // Create blood particles
-        const particlesContainer = document.getElementById('particles-container');
-        for(let i = 0; i < 30; i++) {
-            const p = document.createElement('div');
-            p.className = 'blood-particle';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animationDelay = Math.random() * 15 + 's';
-            p.style.animationDuration = (10 + Math.random() * 10) + 's';
-            particlesContainer.appendChild(p);
+        // Create blood rain
+        const bloodRain = document.getElementById('blood-rain');
+        for(let i = 0; i < 50; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'blood-drop';
+            drop.style.left = Math.random() * 100 + '%';
+            drop.style.animationDuration = (2 + Math.random() * 3) + 's';
+            drop.style.animationDelay = Math.random() * 5 + 's';
+            bloodRain.appendChild(drop);
         }
+
+        // Avatar selection
+        document.querySelectorAll('.avatar-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                myAvatar = opt.dataset.avatar;
+            });
+        });
 
         // ====== LOBBY ======
 
         document.getElementById('btn-enter').onclick = () => {
             const name = document.getElementById('nickname-input').value.trim();
-            if (!name) return;
+            if (!name) return alert("Digite seu nome!");
             myName = name.toUpperCase();
             document.getElementById('my-name-display').textContent = myName;
+            document.getElementById('my-avatar-display').textContent = myAvatar;
             document.getElementById('user-display').classList.remove('hidden');
             $loginView.classList.add('hidden');
             $roomsView.classList.remove('hidden');
@@ -614,22 +675,21 @@
                 $roomsList.innerHTML = '';
                 const rooms = snap.val();
                 if (!rooms) {
-                    $roomsList.innerHTML = '<p class="text-center text-gray-600 py-12">Nenhuma sala encontrada. Crie uma!</p>';
+                    $roomsList.innerHTML = '<p class="text-center text-gray-600 py-12">Nenhuma sala. Crie uma!</p>';
                     return;
                 }
                 
-                Object.entries(rooms).forEach(([id, room], idx) => {
+                Object.entries(rooms).forEach(([id, room]) => {
                     const count = room.players ? Object.keys(room.players).length : 0;
                     const isFull = count >= 6;
                     const isPlaying = room.status === 'playing';
                     
                     const div = document.createElement('div');
-                    div.className = 'room-card rounded-lg p-4 flex items-center justify-between';
-                    div.style.animationDelay = `${idx * 0.05}s`;
+                    div.className = 'room-card rounded-xl p-4 flex items-center justify-between';
                     div.innerHTML = `
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-red-900 to-red-950 flex items-center justify-center">
-                                <i class="fas fa-skull text-red-500"></i>
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-red-900 to-black flex items-center justify-center text-2xl">
+                                💀
                             </div>
                             <div>
                                 <p class="font-bold text-white text-lg">${room.name}</p>
@@ -637,8 +697,8 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
-                            ${isPlaying ? '<span class="text-xs text-yellow-600 uppercase px-2 py-1 bg-yellow-900/30 rounded"><i class="fas fa-gamepad mr-1"></i>Em jogo</span>' : ''}
-                            <span class="text-lg font-bold ${isFull ? 'text-red-500' : 'text-green-500'}">${count}/6</span>
+                            ${isPlaying ? '<span class="text-xs text-yellow-500 bg-yellow-900/30 px-2 py-1 rounded"><i class="fas fa-gamepad mr-1"></i>Em jogo</span>' : ''}
+                            <span class="text-xl font-bold ${isFull ? 'text-red-500' : 'text-green-500'}">${count}/6</span>
                             <i class="fas fa-chevron-right text-gray-700"></i>
                         </div>
                     `;
@@ -672,6 +732,7 @@
             const playerRef = ref(db, `rooms/${roomId}/players/${myId}`);
             await set(playerRef, {
                 name: myName,
+                avatar: myAvatar,
                 slot: mySlot,
                 isDead: false,
                 micOn: false
@@ -692,8 +753,8 @@
             for (let i = 0; i < 6; i++) {
                 const slot = document.createElement('div');
                 slot.id = `slot-${i}`;
-                slot.className = 'player-slot rounded-lg p-4 text-center h-28 flex flex-col items-center justify-center';
-                slot.innerHTML = `<i class="fas fa-user-slash text-3xl text-gray-800"></i><p class="text-xs text-gray-700 mt-2">Vazio</p>`;
+                slot.className = 'player-slot rounded-xl p-4 text-center h-32 flex flex-col items-center justify-center';
+                slot.innerHTML = `<i class="fas fa-user-slash text-4xl text-gray-800"></i><p class="text-xs text-gray-700 mt-2">Vazio</p>`;
                 $playersGrid.appendChild(slot);
             }
 
@@ -711,17 +772,21 @@
                 if (data.status === 'playing') {
                     startGame(data);
                 }
+                
+                if (data.status === 'restarting') {
+                    handleRestart();
+                }
             });
 
-            // Chat listener
+            // Chat
             onValue(ref(db, `rooms/${roomId}/chat`), (snap) => {
                 const messages = snap.val();
                 if (!messages) return;
                 $chatMessages.innerHTML = '';
                 Object.values(messages).slice(-50).forEach(msg => {
                     const div = document.createElement('div');
-                    div.className = 'chat-message';
-                    div.innerHTML = `<span class="text-red-500 font-bold">${msg.name}:</span> <span class="text-gray-300">${msg.text}</span>`;
+                    div.className = 'chat-msg';
+                    div.innerHTML = `<span class="text-red-500 font-bold">${msg.avatar} ${msg.name}:</span> <span class="text-gray-300">${msg.text}</span>`;
                     $chatMessages.appendChild(div);
                 });
                 $chatMessages.scrollTop = $chatMessages.scrollHeight;
@@ -734,25 +799,25 @@
 
             for (let i = 0; i < 6; i++) {
                 const slot = document.getElementById(`slot-${i}`);
-                slot.className = 'player-slot rounded-lg p-4 text-center h-28 flex flex-col items-center justify-center';
-                slot.innerHTML = `<i class="fas fa-user-slash text-3xl text-gray-800"></i><p class="text-xs text-gray-700 mt-2">Vazio</p>`;
+                if (!slot) continue;
+                slot.className = 'player-slot rounded-xl p-4 text-center h-32 flex flex-col items-center justify-center';
+                slot.innerHTML = `<i class="fas fa-user-slash text-4xl text-gray-800"></i><p class="text-xs text-gray-700 mt-2">Vazio</p>`;
             }
 
             Object.entries(players).forEach(([pid, p]) => {
                 const slot = document.getElementById(`slot-${p.slot}`);
+                if (!slot) return;
                 slot.classList.add('occupied');
                 if (pid === myId) slot.classList.add('is-me');
                 slot.innerHTML = `
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-red-800 to-red-950 flex items-center justify-center mb-2">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
+                    <div class="text-4xl mb-2">${p.avatar || '💀'}</div>
                     <p class="text-sm font-bold ${pid === myId ? 'text-red-400' : 'text-white'}">${p.name}</p>
-                    ${pid === room.hostId ? '<span class="text-xs text-yellow-500"><i class="fas fa-crown"></i> Host</span>' : ''}
+                    ${pid === room.hostId ? '<span class="text-xs text-yellow-500"><i class="fas fa-crown"></i></span>' : ''}
                 `;
             });
 
             const startBtn = document.getElementById('btn-start-match');
-            startBtn.disabled = count < 2;
+            if (startBtn) startBtn.disabled = count < 2;
         }
 
         document.getElementById('btn-leave-room').onclick = leaveRoom;
@@ -768,9 +833,15 @@
                 });
             }
             
+            if (micStream) {
+                micStream.getTracks().forEach(t => t.stop());
+                micStream = null;
+            }
+            
             currentRoom = null;
             mySlot = -1;
             gameData = null;
+            roundNum = 1;
             
             $waitingRoom.style.display = 'none';
             $gameHud.classList.add('hidden');
@@ -785,14 +856,15 @@
             const bullet = Math.floor(Math.random() * 6);
             const snap = await get(ref(db, `rooms/${currentRoom}/players`));
             const players = snap.val();
-            const alivePlayers = Object.values(players).filter(p => !p.isDead).sort((a, b) => a.slot - b.slot);
+            const slots = Object.values(players).map(p => p.slot).sort((a, b) => a - b);
             
             await update(ref(db, `rooms/${currentRoom}`), {
                 status: 'playing',
                 bulletPos: bullet,
                 chamber: 0,
-                currentTurnSlot: alivePlayers[0]?.slot || 0,
-                roundStartTime: Date.now()
+                currentTurnSlot: slots[0],
+                round: 1,
+                lastAction: null
             });
         };
 
@@ -802,35 +874,114 @@
             $waitingRoom.style.display = 'none';
             $gameHud.classList.remove('hidden');
             
-            init3D();
+            if (!scene) init3D();
             setupGameLoop();
-            showMessage("QUE O JOGO COMECE", "Boa sorte...", 2500);
+            showMessage("QUE O JOGO COMECE", "Boa sorte... 💀", 2500);
         }
 
         function setupGameLoop() {
             onValue(ref(db, `rooms/${currentRoom}`), (snap) => {
                 const room = snap.val();
-                if (!room || room.status !== 'playing') return;
+                if (!room) return;
                 
                 gameData = room;
-                updateGameState(room);
+                
+                if (room.status === 'playing') {
+                    updateGameState(room);
+                }
+                
+                // Handle last action for sync
+                if (room.lastAction) {
+                    handleAction(room.lastAction);
+                }
             });
+        }
+
+        let lastActionTime = 0;
+        
+        function handleAction(action) {
+            if (action.time <= lastActionTime) return;
+            lastActionTime = action.time;
+            
+            if (action.type === 'bang') {
+                handleBangSync(action.slot, action.name);
+            } else if (action.type === 'click') {
+                playSound('click');
+                if (cylinderMesh) cylinderMesh.rotation.z += Math.PI / 3;
+            }
+        }
+
+        function handleBangSync(slot, name) {
+            playSound('bang');
+            
+            const mesh = Object.values(playerMeshes).find(m => m.userData.slot === slot);
+            if (mesh) {
+                // Gore explosion
+                const headPos = mesh.position.clone();
+                headPos.y += 8;
+                createMassiveGore(headPos);
+                
+                // Hide head
+                if (mesh.userData.headGroup) {
+                    mesh.userData.headGroup.visible = false;
+                }
+                
+                // Fall animation
+                let fall = 0;
+                const fallInterval = setInterval(() => {
+                    fall += 0.12;
+                    mesh.rotation.x = -Math.min(fall, 1.5);
+                    mesh.position.y = -5 - fall * 2;
+                    if (fall >= 1.5) clearInterval(fallInterval);
+                }, 16);
+            }
+            
+            // Gun recoil
+            if (magnumGun) {
+                magnumGun.rotation.x = -0.5;
+                setTimeout(() => magnumGun.rotation.x = 0, 200);
+            }
+            
+            // Blood overlay if it's me
+            if (slot === mySlot) {
+                $bloodOverlay.style.opacity = 1;
+                setTimeout(() => $bloodOverlay.style.opacity = 0.5, 500);
+            }
         }
 
         function updateGameState(room) {
             const players = room.players || {};
-            const alivePlayers = Object.values(players).filter(p => !p.isDead);
+            const alivePlayers = Object.entries(players).filter(([_, p]) => !p.isDead);
+            
+            document.getElementById('round-num').textContent = room.round || 1;
             
             // Check winner
             if (alivePlayers.length === 1) {
-                const winner = alivePlayers[0];
-                showMessage(winner.name === myName ? "VOCÊ VENCEU!" : `${winner.name} VENCEU!`, "Único sobrevivente", 5000);
+                const [winnerId, winner] = alivePlayers[0];
+                const isMe = winnerId === myId;
+                showMessage(
+                    isMe ? "VOCÊ VENCEU!" : `${winner.name} VENCEU!`, 
+                    isMe ? "Sobrevivente! 🏆" : "Único sobrevivente...", 
+                    5000
+                );
                 document.getElementById('btn-trigger').classList.add('hidden');
+                
+                // Restart after delay (host triggers)
+                if (isHost) {
+                    setTimeout(() => {
+                        update(ref(db, `rooms/${currentRoom}`), { status: 'restarting' });
+                    }, 5000);
+                }
                 return;
             }
             
             if (alivePlayers.length === 0) {
                 showMessage("TODOS MORTOS", "Fim de jogo", 5000);
+                if (isHost) {
+                    setTimeout(() => {
+                        update(ref(db, `rooms/${currentRoom}`), { status: 'restarting' });
+                    }, 5000);
+                }
                 return;
             }
 
@@ -845,16 +996,62 @@
             if (isMyTurn) {
                 document.getElementById('btn-trigger').classList.remove('hidden');
                 document.getElementById('watching-msg').classList.add('hidden');
+                showMessage("SUA VEZ", "Puxe o gatilho...", 2000);
             } else {
                 document.getElementById('btn-trigger').classList.add('hidden');
-                if (me && me.isDead) {
+                if (!me || me.isDead) {
                     document.getElementById('watching-msg').classList.remove('hidden');
+                    document.getElementById('watching-msg').innerHTML = '<p class="text-gray-500 text-lg"><i class="fas fa-skull mr-2"></i> Você está morto. Observando...</p>';
+                } else {
+                    document.getElementById('watching-msg').classList.remove('hidden');
+                    document.getElementById('watching-msg').innerHTML = '<p class="text-gray-500 text-lg"><i class="fas fa-hourglass-half mr-2"></i> Aguardando turno...</p>';
                 }
             }
         }
 
+        async function handleRestart() {
+            showMessage("NOVA RODADA", "Reiniciando...", 2000);
+            
+            $bloodOverlay.style.opacity = 0;
+            
+            // Reset player states
+            if (isHost) {
+                const snap = await get(ref(db, `rooms/${currentRoom}/players`));
+                const players = snap.val();
+                const updates = {};
+                const slots = [];
+                
+                Object.entries(players).forEach(([pid, p]) => {
+                    updates[`players/${pid}/isDead`] = false;
+                    slots.push(p.slot);
+                });
+                
+                slots.sort((a, b) => a - b);
+                
+                updates.status = 'playing';
+                updates.bulletPos = Math.floor(Math.random() * 6);
+                updates.chamber = 0;
+                updates.currentTurnSlot = slots[0];
+                updates.round = (gameData?.round || 1) + 1;
+                updates.lastAction = null;
+                
+                await update(ref(db, `rooms/${currentRoom}`), updates);
+            }
+            
+            // Reset 3D meshes
+            Object.values(playerMeshes).forEach(mesh => {
+                mesh.rotation.x = 0;
+                mesh.position.y = -5;
+                if (mesh.userData.headGroup) {
+                    mesh.userData.headGroup.visible = true;
+                }
+            });
+        }
+
         document.getElementById('btn-trigger').onclick = async () => {
-            document.getElementById('btn-trigger').classList.add('hidden');
+            const btn = document.getElementById('btn-trigger');
+            btn.classList.add('hidden');
+            btn.disabled = true;
             
             const snap = await get(ref(db, `rooms/${currentRoom}`));
             const room = snap.val();
@@ -862,83 +1059,50 @@
             
             const isBang = room.chamber === room.bulletPos;
             
-            // Animate cylinder rotation
-            if (cylinderMesh) {
-                cylinderMesh.rotation.z += Math.PI / 3;
-            }
+            if (cylinderMesh) cylinderMesh.rotation.z += Math.PI / 3;
             
             if (isBang) {
                 // I die
-                playSound('bang');
-                
                 await update(ref(db, `rooms/${currentRoom}/players/${myId}`), { isDead: true });
                 
-                // Find next alive player or end game
-                const alivePlayers = Object.values(players)
-                    .filter(p => p.slot !== mySlot && !p.isDead)
-                    .sort((a, b) => a.slot - b.slot);
+                // Find next alive player
+                const alivePlayers = Object.entries(players)
+                    .filter(([pid, p]) => pid !== myId && !p.isDead)
+                    .sort((a, b) => a[1].slot - b[1].slot);
                 
                 let nextSlot = room.currentTurnSlot;
                 if (alivePlayers.length > 0) {
-                    // Find next slot after current
-                    const nextPlayer = alivePlayers.find(p => p.slot > room.currentTurnSlot) || alivePlayers[0];
-                    nextSlot = nextPlayer.slot;
+                    const next = alivePlayers.find(([_, p]) => p.slot > room.currentTurnSlot) || alivePlayers[0];
+                    nextSlot = next[1].slot;
                 }
                 
                 await update(ref(db, `rooms/${currentRoom}`), {
                     chamber: (room.chamber + 1) % 6,
                     currentTurnSlot: nextSlot,
-                    lastAction: { type: 'bang', slot: mySlot, time: Date.now() }
+                    lastAction: { type: 'bang', slot: mySlot, name: myName, time: Date.now() }
                 });
                 
-                // Visual effects
-                handleBang(mySlot, players);
-                $bloodOverlay.style.opacity = 1;
-                showMessage("VOCÊ MORREU", "💀", 3000);
-                setTimeout(() => $bloodOverlay.style.opacity = 0, 2000);
+                showMessage("VOCÊ MORREU", "💀💀💀", 3000);
                 
             } else {
                 // Survived
-                playSound('click');
+                const alivePlayers = Object.entries(players)
+                    .filter(([_, p]) => !p.isDead)
+                    .sort((a, b) => a[1].slot - b[1].slot);
                 
-                // Find next alive player
-                const alivePlayers = Object.values(players)
-                    .filter(p => !p.isDead)
-                    .sort((a, b) => a.slot - b.slot);
-                
-                const nextPlayer = alivePlayers.find(p => p.slot > room.currentTurnSlot) || alivePlayers[0];
+                const next = alivePlayers.find(([_, p]) => p.slot > room.currentTurnSlot) || alivePlayers[0];
                 
                 await update(ref(db, `rooms/${currentRoom}`), {
                     chamber: (room.chamber + 1) % 6,
-                    currentTurnSlot: nextPlayer.slot,
+                    currentTurnSlot: next[1].slot,
                     lastAction: { type: 'click', slot: mySlot, time: Date.now() }
                 });
                 
                 showMessage("CLICK", "Você sobreviveu...", 1500);
             }
-        };
-
-        function handleBang(slot, players) {
-            const mesh = Object.values(playerMeshes).find(m => m.userData.slot === slot);
-            if (mesh && mesh.userData.headGroup) {
-                mesh.userData.headGroup.visible = false;
-                createBloodExplosion(mesh.position.clone().add(new THREE.Vector3(0, 8, 0)));
-                
-                // Fall animation
-                let fall = 0;
-                const fallInterval = setInterval(() => {
-                    fall += 0.15;
-                    mesh.rotation.x = -Math.min(fall, 1.5);
-                    if (fall >= 1.5) clearInterval(fallInterval);
-                }, 16);
-            }
             
-            // Recoil
-            if (gunGroup) {
-                gunGroup.rotation.x = -0.4;
-                setTimeout(() => gunGroup.rotation.x = 0, 200);
-            }
-        }
+            btn.disabled = false;
+        };
 
         function showMessage(title, sub, duration) {
             $msgText.textContent = title;
@@ -960,6 +1124,7 @@
             
             push(ref(db, `rooms/${currentRoom}/chat`), {
                 name: myName,
+                avatar: myAvatar,
                 text: text,
                 time: Date.now()
             });
@@ -970,10 +1135,8 @@
         // ====== 3D ======
 
         function init3D() {
-            if (renderer) return;
-            
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x0a0000, 0.02);
+            scene.fog = new THREE.FogExp2(0x0a0000, 0.018);
             
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             
@@ -984,29 +1147,29 @@
             document.getElementById('canvas-container').appendChild(renderer.domElement);
             
             // Lighting
-            const ambient = new THREE.AmbientLight(0x1a0000, 0.4);
+            const ambient = new THREE.AmbientLight(0x1a0000, 0.5);
             scene.add(ambient);
             
-            const spot = new THREE.SpotLight(0xffeedd, 1.2);
-            spot.position.set(0, 35, 0);
+            const spot = new THREE.SpotLight(0xffeedd, 1.5);
+            spot.position.set(0, 40, 0);
             spot.angle = Math.PI / 3;
             spot.penumbra = 0.8;
             spot.castShadow = true;
             scene.add(spot);
             
-            const redLight = new THREE.PointLight(0x660000, 0.8, 40);
-            redLight.position.set(-15, 8, -15);
+            const redLight = new THREE.PointLight(0x660000, 1, 50);
+            redLight.position.set(-20, 10, -20);
             scene.add(redLight);
 
-            const redLight2 = new THREE.PointLight(0x440000, 0.5, 40);
-            redLight2.position.set(15, 8, 15);
+            const redLight2 = new THREE.PointLight(0x440000, 0.8, 50);
+            redLight2.position.set(20, 10, 20);
             scene.add(redLight2);
             
             // Table
-            const tableGeo = new THREE.CylinderGeometry(14, 14, 1.5, 64);
+            const tableGeo = new THREE.CylinderGeometry(15, 15, 1.5, 64);
             const tableMat = new THREE.MeshStandardMaterial({ 
-                color: 0x1a1208, 
-                roughness: 0.7,
+                color: 0x1a0a05, 
+                roughness: 0.6,
                 metalness: 0.1
             });
             const table = new THREE.Mesh(tableGeo, tableMat);
@@ -1015,141 +1178,154 @@
             scene.add(table);
             
             // Table felt
-            const feltGeo = new THREE.CircleGeometry(13, 64);
+            const feltGeo = new THREE.CircleGeometry(14, 64);
             feltGeo.rotateX(-Math.PI / 2);
             const feltMat = new THREE.MeshStandardMaterial({ color: 0x0a1a0a, roughness: 1 });
             const felt = new THREE.Mesh(feltGeo, feltMat);
-            felt.position.y = -0.24;
+            felt.position.y = -0.2;
             scene.add(felt);
             
             // Floor
-            const floorGeo = new THREE.PlaneGeometry(200, 200);
+            const floorGeo = new THREE.PlaneGeometry(300, 300);
             const floorMat = new THREE.MeshStandardMaterial({ color: 0x050202, roughness: 1 });
             const floor = new THREE.Mesh(floorGeo, floorMat);
             floor.rotation.x = -Math.PI / 2;
-            floor.position.y = -12;
+            floor.position.y = -15;
             floor.receiveShadow = true;
             scene.add(floor);
             
-            createGun();
+            createMagnumRevolver();
             
             clock = new THREE.Clock();
             window.addEventListener('resize', onResize);
             animate();
         }
 
-        function createGun() {
-            gunGroup = new THREE.Group();
+        function createMagnumRevolver() {
+            magnumGun = new THREE.Group();
             
-            const metalDark = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.95, roughness: 0.15 });
-            const metalLight = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.9, roughness: 0.2 });
-            const wood = new THREE.MeshStandardMaterial({ color: 0x3d1e10, roughness: 0.6, metalness: 0 });
+            const metalDark = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.95, roughness: 0.1 });
+            const metalShiny = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.98, roughness: 0.05 });
+            const wood = new THREE.MeshStandardMaterial({ color: 0x4a2510, roughness: 0.5, metalness: 0 });
             
-            // Barrel
-            const barrelOuter = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 6, 24), metalDark);
+            // Main barrel (long magnum style)
+            const barrelOuter = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 8, 32), metalShiny);
             barrelOuter.rotation.x = Math.PI / 2;
-            barrelOuter.position.z = 3;
+            barrelOuter.position.z = 4;
             barrelOuter.castShadow = true;
-            gunGroup.add(barrelOuter);
+            magnumGun.add(barrelOuter);
             
             // Barrel hole
-            const barrelHole = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.3, 16), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+            const barrelHole = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.5, 16), new THREE.MeshBasicMaterial({ color: 0x000000 }));
             barrelHole.rotation.x = Math.PI / 2;
-            barrelHole.position.z = 6;
-            gunGroup.add(barrelHole);
+            barrelHole.position.z = 8;
+            magnumGun.add(barrelHole);
             
-            // Barrel sight
-            const sight = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 0.4), metalLight);
-            sight.position.set(0, 0.5, 5.5);
-            gunGroup.add(sight);
+            // Barrel rib (top sight rail)
+            const rib = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.2, 7), metalDark);
+            rib.position.set(0, 0.6, 3.5);
+            magnumGun.add(rib);
+            
+            // Front sight
+            const frontSight = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.3, 0.3), metalShiny);
+            frontSight.position.set(0, 0.7, 7.5);
+            magnumGun.add(frontSight);
+            
+            // Cylinder housing
+            const housing = new THREE.Mesh(new THREE.BoxGeometry(3, 2.5, 3), metalDark);
+            housing.position.set(0, 0, 0);
+            magnumGun.add(housing);
             
             // Cylinder
             cylinderMesh = new THREE.Group();
             
-            const cylBody = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 2, 32), metalDark);
+            const cylBody = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 2.5, 32), metalShiny);
             cylBody.rotation.x = Math.PI / 2;
             cylBody.castShadow = true;
             cylinderMesh.add(cylBody);
             
-            // Cylinder detail ring
-            const cylRing = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.08, 8, 32), metalLight);
-            cylRing.position.z = 0.9;
-            cylinderMesh.add(cylRing);
-            
-            const cylRing2 = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.08, 8, 32), metalLight);
-            cylRing2.position.z = -0.9;
-            cylinderMesh.add(cylRing2);
-            
-            // Chamber holes
+            // Cylinder flutes and chambers
             for (let i = 0; i < 6; i++) {
                 const angle = (i / 6) * Math.PI * 2;
-                const chamber = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 2.1, 12), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+                
+                // Chamber hole
+                const chamber = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.35, 0.35, 2.6, 12), 
+                    new THREE.MeshBasicMaterial({ color: 0x000000 })
+                );
                 chamber.rotation.x = Math.PI / 2;
-                chamber.position.set(Math.cos(angle) * 0.65, Math.sin(angle) * 0.65, 0);
+                chamber.position.set(Math.cos(angle) * 0.75, Math.sin(angle) * 0.75, 0);
                 cylinderMesh.add(chamber);
+                
+                // Flute (groove)
+                const flute = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.15, 0.5, 2.3),
+                    metalDark
+                );
+                flute.position.set(Math.cos(angle + 0.5) * 1.2, Math.sin(angle + 0.5) * 1.2, 0);
+                flute.rotation.z = angle + 0.5;
+                cylinderMesh.add(flute);
             }
-            gunGroup.add(cylinderMesh);
+            
+            cylinderMesh.position.z = 0;
+            magnumGun.add(cylinderMesh);
             
             // Frame
-            const frame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.5, 4), metalDark);
-            frame.position.set(0, -0.5, -1.5);
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(2, 3, 5), metalDark);
+            frame.position.set(0, -0.5, -2);
             frame.castShadow = true;
-            gunGroup.add(frame);
-            
-            // Frame top
-            const frameTop = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 2.5), metalDark);
-            frameTop.position.set(0, 0.9, -1);
-            gunGroup.add(frameTop);
-            
-            // Hammer
-            const hammer = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1, 0.5), metalLight);
-            hammer.position.set(0, 1.2, -2.5);
-            hammer.rotation.x = -0.3;
-            gunGroup.add(hammer);
+            magnumGun.add(frame);
             
             // Trigger guard
-            const triggerGuardShape = new THREE.Shape();
-            triggerGuardShape.moveTo(0, 0);
-            triggerGuardShape.quadraticCurveTo(0.8, -0.8, 0, -1.5);
-            const triggerGuardGeo = new THREE.ExtrudeGeometry(triggerGuardShape, { depth: 0.15, bevelEnabled: false });
-            const triggerGuard = new THREE.Mesh(triggerGuardGeo, metalDark);
-            triggerGuard.position.set(-0.075, -1.2, -1);
-            triggerGuard.rotation.y = Math.PI / 2;
-            gunGroup.add(triggerGuard);
+            const guardCurve = new THREE.TorusGeometry(0.8, 0.1, 8, 16, Math.PI);
+            const guard = new THREE.Mesh(guardCurve, metalDark);
+            guard.position.set(0, -1.8, -1.5);
+            guard.rotation.z = Math.PI;
+            magnumGun.add(guard);
             
             // Trigger
-            const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.7, 0.25), metalLight);
-            trigger.position.set(0, -1.5, -1.2);
-            trigger.rotation.x = -0.4;
-            gunGroup.add(trigger);
+            const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.3), metalShiny);
+            trigger.position.set(0, -1.5, -1.5);
+            trigger.rotation.x = -0.3;
+            magnumGun.add(trigger);
+            
+            // Hammer
+            const hammer = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.2, 0.6), metalShiny);
+            hammer.position.set(0, 1.2, -3.5);
+            hammer.rotation.x = -0.4;
+            magnumGun.add(hammer);
             
             // Grip
-            const grip = new THREE.Mesh(new THREE.BoxGeometry(1.3, 3.5, 1.8), wood);
-            grip.position.set(0, -2.5, -3);
-            grip.rotation.x = 0.35;
+            const grip = new THREE.Mesh(new THREE.BoxGeometry(1.6, 4, 2.2), wood);
+            grip.position.set(0, -3.5, -4);
+            grip.rotation.x = 0.3;
             grip.castShadow = true;
-            gunGroup.add(grip);
+            magnumGun.add(grip);
             
-            // Grip details
-            const gripDetail = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.5, 1.3), metalDark);
-            gripDetail.position.set(0.7, -2.3, -2.8);
-            gripDetail.rotation.x = 0.35;
-            gunGroup.add(gripDetail);
+            // Grip checkering pattern
+            for (let i = 0; i < 8; i++) {
+                const line = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.05, 0.3, 1.8),
+                    new THREE.MeshStandardMaterial({ color: 0x2a1508 })
+                );
+                line.position.set(0.85, -2.5 - i * 0.35, -4);
+                line.rotation.x = 0.3;
+                magnumGun.add(line);
+                
+                const line2 = line.clone();
+                line2.position.x = -0.85;
+                magnumGun.add(line2);
+            }
             
-            const gripDetail2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.5, 1.3), metalDark);
-            gripDetail2.position.set(-0.7, -2.3, -2.8);
-            gripDetail2.rotation.x = 0.35;
-            gunGroup.add(gripDetail2);
-            
-            gunGroup.position.y = 1;
-            gunGroup.scale.set(1.3, 1.3, 1.3);
-            scene.add(gunGroup);
+            magnumGun.position.y = 1.5;
+            magnumGun.scale.set(1.2, 1.2, 1.2);
+            scene.add(magnumGun);
         }
 
         function createPlayerMesh(id, data) {
             const group = new THREE.Group();
             const angle = data.slot * (Math.PI * 2 / 6) - Math.PI / 2;
-            const radius = 16;
+            const radius = 18;
             
             group.position.set(
                 Math.cos(angle) * radius,
@@ -1159,155 +1335,127 @@
             group.lookAt(0, -3, 0);
             
             const colors = [0x8b0000, 0x006400, 0x00008b, 0x8b8b00, 0x008b8b, 0x4b0082];
-            const skinTone = 0xe8c4a8;
+            const skinTone = 0xe8beac;
             
-            const clothMat = new THREE.MeshStandardMaterial({ color: colors[data.slot] || 0x333333, roughness: 0.7 });
-            const skinMat = new THREE.MeshStandardMaterial({ color: skinTone, roughness: 0.5 });
+            const clothMat = new THREE.MeshStandardMaterial({ color: colors[data.slot] || 0x333333, roughness: 0.6 });
+            const skinMat = new THREE.MeshStandardMaterial({ color: skinTone, roughness: 0.4 });
             const hairMat = new THREE.MeshStandardMaterial({ color: 0x1a1209, roughness: 0.8 });
             
-            // Torso
-            const torso = new THREE.Mesh(new THREE.BoxGeometry(4.5, 6, 2.5), clothMat);
-            torso.position.y = 3;
+            // Body
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(5, 7, 3), clothMat);
+            torso.position.y = 3.5;
             torso.castShadow = true;
             group.add(torso);
             
-            // Collar
-            const collar = new THREE.Mesh(new THREE.BoxGeometry(2, 0.5, 1.5), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
-            collar.position.y = 5.8;
-            group.add(collar);
-            
             // Shoulders
-            const shoulderGeo = new THREE.SphereGeometry(0.9, 12, 12);
-            const shoulderL = new THREE.Mesh(shoulderGeo, clothMat);
-            shoulderL.position.set(-2.8, 5, 0);
-            shoulderL.castShadow = true;
+            const shoulderL = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), clothMat);
+            shoulderL.position.set(-3, 5.5, 0);
             group.add(shoulderL);
             
-            const shoulderR = new THREE.Mesh(shoulderGeo, clothMat);
-            shoulderR.position.set(2.8, 5, 0);
-            shoulderR.castShadow = true;
+            const shoulderR = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), clothMat);
+            shoulderR.position.set(3, 5.5, 0);
             group.add(shoulderR);
             
             // Arms
-            const armGeo = new THREE.CylinderGeometry(0.55, 0.5, 4.5, 12);
-            const armL = new THREE.Mesh(armGeo, clothMat);
-            armL.position.set(-3.2, 2.5, 2);
-            armL.rotation.x = -1.1;
+            const armL = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.5, 5, 12), clothMat);
+            armL.position.set(-3.5, 2, 2.5);
+            armL.rotation.x = -1;
             armL.rotation.z = 0.2;
-            armL.castShadow = true;
             group.add(armL);
             
-            const armR = new THREE.Mesh(armGeo, clothMat);
-            armR.position.set(3.2, 2.5, 2);
-            armR.rotation.x = -1.1;
+            const armR = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.5, 5, 12), clothMat);
+            armR.position.set(3.5, 2, 2.5);
+            armR.rotation.x = -1;
             armR.rotation.z = -0.2;
-            armR.castShadow = true;
             group.add(armR);
             
-            // Forearms
-            const forearmGeo = new THREE.CylinderGeometry(0.45, 0.4, 3.5, 12);
-            const forearmL = new THREE.Mesh(forearmGeo, skinMat);
-            forearmL.position.set(-2.8, 0.5, 4.5);
-            forearmL.rotation.x = -0.3;
-            forearmL.castShadow = true;
-            group.add(forearmL);
-            
-            const forearmR = new THREE.Mesh(forearmGeo, skinMat);
-            forearmR.position.set(2.8, 0.5, 4.5);
-            forearmR.rotation.x = -0.3;
-            forearmR.castShadow = true;
-            group.add(forearmR);
-            
             // Hands
-            const handGeo = new THREE.SphereGeometry(0.55, 10, 10);
-            const handL = new THREE.Mesh(handGeo, skinMat);
-            handL.position.set(-2.5, 0, 6);
+            const handL = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 12), skinMat);
+            handL.position.set(-3, 0, 5);
             group.add(handL);
             
-            const handR = new THREE.Mesh(handGeo, skinMat);
-            handR.position.set(2.5, 0, 6);
+            const handR = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 12), skinMat);
+            handR.position.set(3, 0, 5);
             group.add(handR);
             
             // Neck
-            const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.8, 1.2, 12), skinMat);
-            neck.position.y = 6.5;
+            const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.8, 1.5, 12), skinMat);
+            neck.position.y = 7.5;
             group.add(neck);
             
             // Head Group
             const headGroup = new THREE.Group();
-            headGroup.position.y = 8;
+            headGroup.position.y = 9;
             group.add(headGroup);
             
             // Head
-            const head = new THREE.Mesh(new THREE.SphereGeometry(1.5, 24, 24), skinMat);
-            head.scale.set(1, 1.1, 1);
+            const head = new THREE.Mesh(new THREE.SphereGeometry(1.8, 24, 24), skinMat);
+            head.scale.set(1, 1.15, 1);
             head.castShadow = true;
             headGroup.add(head);
             
-            // Ears
-            const earGeo = new THREE.SphereGeometry(0.25, 8, 8);
-            earGeo.scale(1, 1.3, 0.6);
-            const earL = new THREE.Mesh(earGeo, skinMat);
-            earL.position.set(-1.5, 0, 0);
-            headGroup.add(earL);
-            
-            const earR = new THREE.Mesh(earGeo, skinMat);
-            earR.position.set(1.5, 0, 0);
-            headGroup.add(earR);
-            
             // Eyes
-            const eyeWhiteGeo = new THREE.SphereGeometry(0.22, 12, 12);
-            const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const eyePupilGeo = new THREE.SphereGeometry(0.12, 8, 8);
-            const eyePupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const eyeWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const eyePupil = new THREE.MeshBasicMaterial({ color: 0x000000 });
             
-            const eyeL = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
-            eyeL.position.set(-0.5, 0.2, 1.35);
+            const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), eyeWhite);
+            eyeL.position.set(-0.6, 0.3, 1.6);
             headGroup.add(eyeL);
             
-            const pupilL = new THREE.Mesh(eyePupilGeo, eyePupilMat);
-            pupilL.position.set(-0.5, 0.2, 1.52);
+            const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), eyePupil);
+            pupilL.position.set(-0.6, 0.3, 1.78);
             headGroup.add(pupilL);
             
-            const eyeR = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
-            eyeR.position.set(0.5, 0.2, 1.35);
+            const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), eyeWhite);
+            eyeR.position.set(0.6, 0.3, 1.6);
             headGroup.add(eyeR);
             
-            const pupilR = new THREE.Mesh(eyePupilGeo, eyePupilMat);
-            pupilR.position.set(0.5, 0.2, 1.52);
+            const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), eyePupil);
+            pupilR.position.set(0.6, 0.3, 1.78);
             headGroup.add(pupilR);
             
             // Eyebrows
-            const browGeo = new THREE.BoxGeometry(0.4, 0.1, 0.1);
-            const browMat = new THREE.MeshBasicMaterial({ color: 0x1a1209 });
-            const browL = new THREE.Mesh(browGeo, browMat);
-            browL.position.set(-0.5, 0.55, 1.4);
+            const browL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.15), hairMat);
+            browL.position.set(-0.6, 0.7, 1.65);
             browL.rotation.z = 0.15;
             headGroup.add(browL);
             
-            const browR = new THREE.Mesh(browGeo, browMat);
-            browR.position.set(0.5, 0.55, 1.4);
+            const browR = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.15), hairMat);
+            browR.position.set(0.6, 0.7, 1.65);
             browR.rotation.z = -0.15;
             headGroup.add(browR);
             
             // Nose
-            const nose = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 8), skinMat);
-            nose.position.set(0, -0.1, 1.5);
+            const nose = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 8), skinMat);
+            nose.position.set(0, 0, 1.8);
             nose.rotation.x = Math.PI / 2;
             headGroup.add(nose);
             
             // Mouth
-            const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.05), new THREE.MeshBasicMaterial({ color: 0x8b4040 }));
-            mouth.position.set(0, -0.55, 1.4);
+            const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.1), new THREE.MeshBasicMaterial({ color: 0x8b4040 }));
+            mouth.position.set(0, -0.6, 1.7);
             headGroup.add(mouth);
             
             // Hair
-            const hair = new THREE.Mesh(new THREE.SphereGeometry(1.55, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2.5), hairMat);
-            hair.position.y = 0.4;
+            const hair = new THREE.Mesh(
+                new THREE.SphereGeometry(1.9, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2.2),
+                hairMat
+            );
+            hair.position.y = 0.3;
             hair.rotation.x = -0.15;
             headGroup.add(hair);
             
-            // Store
+            // Ears
+            const earL = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), skinMat);
+            earL.scale.set(0.5, 1, 0.6);
+            earL.position.set(-1.7, 0, 0);
+            headGroup.add(earL);
+            
+            const earR = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), skinMat);
+            earR.scale.set(0.5, 1, 0.6);
+            earR.position.set(1.7, 0, 0);
+            headGroup.add(earR);
+            
             group.userData = { 
                 id, 
                 slot: data.slot, 
@@ -1334,9 +1482,19 @@
             label.id = `label-${id}`;
             label.className = 'label-3d';
             
-            const micIcon = id === myId ? `<i class="mic-icon fas fa-microphone-slash muted"></i>` : '';
-            label.innerHTML = `${micIcon}<span>${data.name}</span>`;
-            if (id === myId) label.innerHTML += ' <span class="text-red-400 text-xs">(você)</span>';
+            let micHtml = '';
+            if (id === myId) {
+                micHtml = `<div class="mic-status ${isMuted ? 'off' : 'on'}">
+                    <i class="fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                    <span>${isMuted ? 'MUDO' : 'AO VIVO'}</span>
+                </div>`;
+            }
+            
+            label.innerHTML = `
+                <span class="avatar-emoji">${data.avatar || '💀'}</span>
+                <span>${data.name}${id === myId ? ' (você)' : ''}</span>
+                ${micHtml}
+            `;
             
             $labels3d.appendChild(label);
         }
@@ -1365,11 +1523,15 @@
                     label.classList.toggle('current-turn', data.slot === currentTurnSlot && !data.isDead);
                     label.classList.toggle('dead', data.isDead);
                     
-                    // Update mic icon for me
+                    // Update mic status for me
                     if (id === myId) {
-                        const micIcon = label.querySelector('.mic-icon');
-                        if (micIcon) {
-                            micIcon.className = `mic-icon fas ${isMuted ? 'fa-microphone-slash muted' : 'fa-microphone active'}`;
+                        const micStatus = label.querySelector('.mic-status');
+                        if (micStatus) {
+                            micStatus.className = `mic-status ${isMuted ? 'off' : 'on'}`;
+                            micStatus.innerHTML = `
+                                <i class="fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                                <span>${isMuted ? 'MUDO' : 'AO VIVO'}</span>
+                            `;
                         }
                     }
                 }
@@ -1379,73 +1541,85 @@
                 }
             });
             
-            // Camera position
+            // Camera position based on my slot
             const myPlayer = players[myId];
             if (myPlayer) {
                 const angle = myPlayer.slot * (Math.PI * 2 / 6) - Math.PI / 2;
-                const camX = Math.cos(angle) * 28;
-                const camZ = Math.sin(angle) * 28;
-                camera.position.set(camX, 14, camZ);
+                const camX = Math.cos(angle) * 32;
+                const camZ = Math.sin(angle) * 32;
+                camera.position.lerp(new THREE.Vector3(camX, 16, camZ), 0.1);
                 camera.lookAt(0, 0, 0);
             }
         }
 
         function rotateGunToSlot(slot) {
-            if (!gunGroup) return;
+            if (!magnumGun) return;
             const angle = slot * (Math.PI * 2 / 6) - Math.PI / 2;
             
-            // Fast spin animation
+            // Fast spin
             const targetY = -angle;
-            const startY = gunGroup.rotation.y;
-            const diff = targetY - startY;
+            let spins = 0;
+            const maxSpins = 20;
             
-            let progress = 0;
             const spinInterval = setInterval(() => {
-                progress += 0.15;
-                gunGroup.rotation.y = startY + diff * Math.min(progress, 1);
-                if (progress >= 1) clearInterval(spinInterval);
+                magnumGun.rotation.y += 0.5;
+                spins++;
+                if (spins >= maxSpins) {
+                    clearInterval(spinInterval);
+                    magnumGun.rotation.y = targetY;
+                }
             }, 16);
         }
 
-        function createBloodExplosion(pos) {
-            // Particles
-            const geo = new THREE.BufferGeometry();
-            const count = 200;
-            const positions = [];
-            const velocities = [];
-            
-            for (let i = 0; i < count; i++) {
-                positions.push(pos.x, pos.y, pos.z);
-                velocities.push(
-                    (Math.random() - 0.5) * 20,
-                    Math.random() * 15,
-                    (Math.random() - 0.5) * 20
-                );
+        function createMassiveGore(pos) {
+            // Blood particles
+            for (let i = 0; i < 300; i++) {
+                const geo = new THREE.SphereGeometry(0.1 + Math.random() * 0.2, 6, 6);
+                const mat = new THREE.MeshBasicMaterial({ 
+                    color: new THREE.Color().setHSL(0, 1, 0.2 + Math.random() * 0.3)
+                });
+                const particle = new THREE.Mesh(geo, mat);
+                particle.position.copy(pos);
+                scene.add(particle);
+                
+                particles.push({
+                    mesh: particle,
+                    vel: new THREE.Vector3(
+                        (Math.random() - 0.5) * 25,
+                        Math.random() * 20,
+                        (Math.random() - 0.5) * 25
+                    ),
+                    age: 0,
+                    maxAge: 2 + Math.random() * 2
+                });
             }
             
-            geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            const mat = new THREE.PointsMaterial({ color: 0x990000, size: 0.5, transparent: true });
-            const points = new THREE.Points(geo, mat);
-            scene.add(points);
-            particles.push({ mesh: points, vels: velocities, age: 0 });
-            
             // Gore chunks
-            for (let i = 0; i < 12; i++) {
-                const size = Math.random() * 0.5 + 0.2;
-                const chunk = new THREE.Mesh(
-                    new THREE.BoxGeometry(size, size, size),
-                    new THREE.MeshStandardMaterial({ color: 0x660000, roughness: 0.3 })
-                );
+            for (let i = 0; i < 20; i++) {
+                const size = Math.random() * 0.8 + 0.3;
+                const geo = new THREE.BoxGeometry(size, size, size);
+                const mat = new THREE.MeshStandardMaterial({ 
+                    color: new THREE.Color().setHSL(0, 0.8, 0.15 + Math.random() * 0.1),
+                    roughness: 0.3
+                });
+                const chunk = new THREE.Mesh(geo, mat);
                 chunk.position.copy(pos);
                 scene.add(chunk);
+                
                 particles.push({
                     mesh: chunk,
                     vel: new THREE.Vector3(
-                        (Math.random() - 0.5) * 15,
-                        Math.random() * 12,
-                        (Math.random() - 0.5) * 15
+                        (Math.random() - 0.5) * 18,
+                        Math.random() * 15,
+                        (Math.random() - 0.5) * 18
+                    ),
+                    angVel: new THREE.Vector3(
+                        Math.random() * 10,
+                        Math.random() * 10,
+                        Math.random() * 10
                     ),
                     age: 0,
+                    maxAge: 4 + Math.random() * 3,
                     isChunk: true
                 });
             }
@@ -1459,6 +1633,8 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            if (!scene || !camera || !renderer) return;
+            
             const dt = clock.getDelta();
             const time = clock.getElapsedTime();
             
@@ -1467,31 +1643,24 @@
                 const p = particles[i];
                 p.age += dt;
                 
-                if (p.isChunk) {
-                    p.mesh.position.add(p.vel.clone().multiplyScalar(dt));
-                    p.vel.y -= 20 * dt;
-                    p.mesh.rotation.x += dt * 5;
-                    p.mesh.rotation.z += dt * 3;
-                    
-                    if (p.age > 3) {
-                        scene.remove(p.mesh);
-                        particles.splice(i, 1);
-                    }
-                } else {
-                    const positions = p.mesh.geometry.attributes.position.array;
-                    for (let j = 0; j < p.vels.length / 3; j++) {
-                        positions[j * 3] += p.vels[j * 3] * dt;
-                        positions[j * 3 + 1] += p.vels[j * 3 + 1] * dt;
-                        positions[j * 3 + 2] += p.vels[j * 3 + 2] * dt;
-                        p.vels[j * 3 + 1] -= 20 * dt;
-                    }
-                    p.mesh.geometry.attributes.position.needsUpdate = true;
-                    p.mesh.material.opacity = 1 - p.age / 2;
-                    
-                    if (p.age > 2) {
-                        scene.remove(p.mesh);
-                        particles.splice(i, 1);
-                    }
+                p.mesh.position.add(p.vel.clone().multiplyScalar(dt));
+                p.vel.y -= 30 * dt; // Gravity
+                
+                if (p.isChunk && p.angVel) {
+                    p.mesh.rotation.x += p.angVel.x * dt;
+                    p.mesh.rotation.y += p.angVel.y * dt;
+                    p.mesh.rotation.z += p.angVel.z * dt;
+                }
+                
+                // Fade out
+                if (p.age > p.maxAge * 0.7) {
+                    p.mesh.material.opacity = 1 - (p.age - p.maxAge * 0.7) / (p.maxAge * 0.3);
+                    p.mesh.material.transparent = true;
+                }
+                
+                if (p.age > p.maxAge) {
+                    scene.remove(p.mesh);
+                    particles.splice(i, 1);
                 }
             }
             
@@ -1502,12 +1671,12 @@
                 const offset = mesh.userData.offset;
                 
                 // Breathing
-                mesh.position.y = -5 + Math.sin(time * 2 + offset) * 0.05;
+                mesh.position.y = -5 + Math.sin(time * 2 + offset) * 0.08;
                 
                 // Head movement
                 if (mesh.userData.headGroup) {
-                    mesh.userData.headGroup.rotation.y = Math.sin(time * 0.5 + offset) * 0.1;
-                    mesh.userData.headGroup.rotation.x = Math.sin(time * 0.3 + offset) * 0.05;
+                    mesh.userData.headGroup.rotation.y = Math.sin(time * 0.4 + offset) * 0.12;
+                    mesh.userData.headGroup.rotation.x = Math.sin(time * 0.25 + offset) * 0.06;
                 }
             });
             
@@ -1517,7 +1686,7 @@
                 if (!label) return;
                 
                 const pos = mesh.position.clone();
-                pos.y += 12;
+                pos.y += 14;
                 pos.project(camera);
                 
                 const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
@@ -1549,37 +1718,37 @@
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.type = 'square';
-                osc.frequency.setValueAtTime(1200, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.frequency.setValueAtTime(1500, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
                 osc.start(now);
-                osc.stop(now + 0.08);
+                osc.stop(now + 0.1);
             } else if (type === 'bang') {
-                // Low boom
+                // Deep boom
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(80, now);
-                osc.frequency.exponentialRampToValueAtTime(20, now + 0.5);
-                gain.gain.setValueAtTime(2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(15, now + 0.8);
+                gain.gain.setValueAtTime(2.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
                 osc.start(now);
-                osc.stop(now + 0.6);
+                osc.stop(now + 0.8);
                 
                 // Noise
-                const bufferSize = audioCtx.sampleRate * 0.5;
+                const bufferSize = audioCtx.sampleRate * 0.6;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.5);
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.2);
                 }
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 const noiseGain = audioCtx.createGain();
-                noiseGain.gain.setValueAtTime(1, now);
+                noiseGain.gain.setValueAtTime(1.5, now);
                 noise.connect(noiseGain);
                 noiseGain.connect(audioCtx.destination);
                 noise.start(now);
@@ -1595,6 +1764,7 @@
                     micStream.getAudioTracks()[0].enabled = false;
                 } catch (e) {
                     console.error('Mic error:', e);
+                    alert('Não foi possível acessar o microfone');
                     return;
                 }
             }
@@ -1605,26 +1775,30 @@
             const btn = document.getElementById('btn-mic');
             
             if (isMuted) {
-                btn.classList.remove('btn-blood');
-                btn.classList.add('btn-ghost');
+                btn.classList.remove('border-green-500', 'text-green-500', 'shadow-[0_0_20px_rgba(0,255,0,0.5)]');
+                btn.classList.add('border-red-500', 'text-red-500');
                 btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
             } else {
-                btn.classList.remove('btn-ghost');
-                btn.classList.add('btn-blood');
+                btn.classList.remove('border-red-500', 'text-red-500');
+                btn.classList.add('border-green-500', 'text-green-500', 'shadow-[0_0_20px_rgba(0,255,0,0.5)]');
                 btn.innerHTML = '<i class="fas fa-microphone"></i>';
             }
             
-            // Update my label
+            // Update DB
             if (currentRoom) {
                 update(ref(db, `rooms/${currentRoom}/players/${myId}/micOn`), !isMuted);
             }
             
-            // Update local label immediately
+            // Update my label
             const myLabel = document.getElementById(`label-${myId}`);
             if (myLabel) {
-                const micIcon = myLabel.querySelector('.mic-icon');
-                if (micIcon) {
-                    micIcon.className = `mic-icon fas ${isMuted ? 'fa-microphone-slash muted' : 'fa-microphone active'}`;
+                const micStatus = myLabel.querySelector('.mic-status');
+                if (micStatus) {
+                    micStatus.className = `mic-status ${isMuted ? 'off' : 'on'}`;
+                    micStatus.innerHTML = `
+                        <i class="fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                        <span>${isMuted ? 'MUDO' : 'AO VIVO'}</span>
+                    `;
                 }
             }
         };
